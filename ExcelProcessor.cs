@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using OfficeOpenXml;
-using static System.String;
 
-namespace Boundless.ReNamer
+namespace Ideal.ReNamer
 {
     /// <summary>
     /// ExcelProcessor is responsible for interfacing with MS Excel.  All of the data 
@@ -70,7 +69,7 @@ namespace Boundless.ReNamer
                 {
                     done = true;
                 }
-                else if (IsNullOrEmpty(b[1])) // source filename is empty
+                else if (String.IsNullOrEmpty(b[1])) // source filename is empty
                 {
                     done = true;
                 }
@@ -91,7 +90,7 @@ namespace Boundless.ReNamer
                 if (v.Value == null)
                 {
                     // null values are empty strings now.
-                    ret.Add(Empty);
+                    ret.Add(String.Empty);
                 }
                 else
                 {

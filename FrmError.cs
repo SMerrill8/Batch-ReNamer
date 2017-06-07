@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace Boundless.ReNamer
+namespace Ideal.ReNamer
 {
     public partial class FrmError : Form
     {
@@ -9,21 +9,10 @@ namespace Boundless.ReNamer
             set
             {
                 tbxError.Text = value;
-                tbxError.Refresh();
-            }
-        }
-
-        public bool TestMode
-        {
-            set
-            {
-                lblInstruction.Text = 
-                    value 
-                    ? "The following source files do not exist, and the remainder were not copied:" 
-                    : "The following source files do not exist:";
-                lblInstruction.Refresh();
-                tbxError.SelectionStart = 0;
+                tbxError.SelectedText = "";
                 tbxError.SelectionLength = 0;
+                tbxError.SelectionStart = 0;
+                tbxError.Refresh();
             }
         }
 

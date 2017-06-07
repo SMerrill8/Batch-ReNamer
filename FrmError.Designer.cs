@@ -1,4 +1,4 @@
-﻿namespace Boundless.ReNamer
+﻿namespace Ideal.ReNamer
 {
     partial class FrmError
     {
@@ -31,10 +31,9 @@
             this.components = new System.ComponentModel.Container();
             this.tlp = new System.Windows.Forms.TableLayoutPanel();
             this.tbxError = new System.Windows.Forms.TextBox();
-            this.cmdOK = new System.Windows.Forms.Button();
-            this.lblInstruction = new System.Windows.Forms.Label();
             this.ctlRightMouseMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuCopy = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmdOK = new System.Windows.Forms.Button();
             this.tlp.SuspendLayout();
             this.ctlRightMouseMenu.SuspendLayout();
             this.SuspendLayout();
@@ -47,7 +46,6 @@
             this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 22F));
             this.tlp.Controls.Add(this.tbxError, 1, 1);
             this.tlp.Controls.Add(this.cmdOK, 1, 2);
-            this.tlp.Controls.Add(this.lblInstruction, 1, 0);
             this.tlp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp.Location = new System.Drawing.Point(0, 0);
             this.tlp.Name = "tlp";
@@ -66,14 +64,29 @@
             this.tbxError.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbxError.Font = new System.Drawing.Font("Consolas", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbxError.ForeColor = System.Drawing.Color.Red;
-            this.tbxError.Location = new System.Drawing.Point(23, 23);
+            this.tbxError.Location = new System.Drawing.Point(23, 3);
             this.tbxError.Multiline = true;
             this.tbxError.Name = "tbxError";
             this.tbxError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbxError.Size = new System.Drawing.Size(887, 279);
+            this.tbxError.Size = new System.Drawing.Size(887, 299);
             this.tbxError.TabIndex = 0;
             this.tbxError.Text = "Text of error message";
             this.tbxError.WordWrap = false;
+            // 
+            // ctlRightMouseMenu
+            // 
+            this.ctlRightMouseMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.ctlRightMouseMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuCopy});
+            this.ctlRightMouseMenu.Name = "ctlRightMouseMenu";
+            this.ctlRightMouseMenu.Size = new System.Drawing.Size(160, 28);
+            // 
+            // mnuCopy
+            // 
+            this.mnuCopy.Name = "mnuCopy";
+            this.mnuCopy.Size = new System.Drawing.Size(159, 24);
+            this.mnuCopy.Text = "&Copy (Ctl-C)";
+            this.mnuCopy.Click += new System.EventHandler(this.mnuCopy_Click);
             // 
             // cmdOK
             // 
@@ -86,31 +99,6 @@
             this.cmdOK.Text = "OK";
             this.cmdOK.UseVisualStyleBackColor = true;
             this.cmdOK.Click += new System.EventHandler(this.cmdOK_Click);
-            // 
-            // lblInstruction
-            // 
-            this.lblInstruction.AutoSize = true;
-            this.lblInstruction.Dock = System.Windows.Forms.DockStyle.Left;
-            this.lblInstruction.Location = new System.Drawing.Point(23, 0);
-            this.lblInstruction.Name = "lblInstruction";
-            this.lblInstruction.Size = new System.Drawing.Size(336, 20);
-            this.lblInstruction.TabIndex = 2;
-            this.lblInstruction.Text = "The following source files do not exist:";
-            // 
-            // ctlRightMouseMenu
-            // 
-            this.ctlRightMouseMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.ctlRightMouseMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuCopy});
-            this.ctlRightMouseMenu.Name = "ctlRightMouseMenu";
-            this.ctlRightMouseMenu.Size = new System.Drawing.Size(182, 58);
-            // 
-            // mnuCopy
-            // 
-            this.mnuCopy.Name = "mnuCopy";
-            this.mnuCopy.Size = new System.Drawing.Size(181, 26);
-            this.mnuCopy.Text = "&Copy (Ctl-C)";
-            this.mnuCopy.Click += new System.EventHandler(this.mnuCopy_Click);
             // 
             // FrmError
             // 
@@ -139,7 +127,6 @@
         private System.Windows.Forms.TableLayoutPanel tlp;
         private System.Windows.Forms.TextBox tbxError;
         private System.Windows.Forms.Button cmdOK;
-        private System.Windows.Forms.Label lblInstruction;
         private System.Windows.Forms.ContextMenuStrip ctlRightMouseMenu;
         private System.Windows.Forms.ToolStripMenuItem mnuCopy;
     }

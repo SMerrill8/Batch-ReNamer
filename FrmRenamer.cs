@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using static System.String;
-using static Boundless.ReNamer.Properties.Settings;
+using static Ideal.ReNamer.Properties.Settings;
 
-namespace Boundless.ReNamer
+namespace Ideal.ReNamer
 {
     public partial class FrmRenamer : Form
     {
@@ -30,7 +29,7 @@ namespace Boundless.ReNamer
             ctlFolderBrowserDialogSource.Description = "Locate Source Folder";
             ctlFolderBrowserDialogSource.ShowNewFolderButton = false;
             string t = tbxSourceFolder.Text;
-            if (!IsNullOrEmpty(t))
+            if (!String.IsNullOrEmpty(t))
             {
                 DirectoryInfo di = new DirectoryInfo(t);
                 if (di.Exists)
@@ -50,7 +49,7 @@ namespace Boundless.ReNamer
             ctlFolderBrowserDialogDest.Description = "Locate Destination Folder";
             ctlFolderBrowserDialogDest.ShowNewFolderButton = true;
             string t = tbxDestFolder.Text;
-            if (!IsNullOrEmpty(t))
+            if (!String.IsNullOrEmpty(t))
             {
                 DirectoryInfo di = new DirectoryInfo(t);
                 if (di.Exists)
@@ -69,7 +68,7 @@ namespace Boundless.ReNamer
         {
             string t = tbxWorkbookFilename.Text;
             ctlOpenFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            if (!IsNullOrEmpty(t))
+            if (!String.IsNullOrEmpty(t))
             {
                 try
                 {
@@ -110,43 +109,49 @@ namespace Boundless.ReNamer
                 if (r == DialogResult.Cancel)
                     return;
             }
+            int cTotal = 0;
+            int copiedCount = 0;
             try
             {
                 UseWaitCursor = true;
                 btnRun.Enabled = false;
-                int fileCount = Renamer.CopyFiles(
+                Renamer.CopyFiles(
                     tbxSourceFolder.Text, 
                     tbxDestFolder.Text, 
                     tbxWorkbookFilename.Text,
                     chkContinue.Checked, 
-                    chkHasHeaders.Checked
+                    chkHasHeaders.Checked,
+                    ref cTotal,
+                    ref copiedCount
                 );
                 EnableControls();
                 UseWaitCursor = false;
                 MessageBox.Show(
                     chkContinue.Checked
-                        ? $"{fileCount} Files were copied successfully."
-                        : $"All {fileCount} files existed, but none were copied.\r\nCheck \"Continue on Error\" to actually copy the files."
+                        ? $"{copiedCount} of {cTotal} files were copied successfully."
+                        : $"All {cTotal} files existed, but none were copied.\r\nCheck \"Continue on Error\" to actually copy the files."
                 );
             }
             catch (ApplicationException ex)
             {
-                string s = "";
-                if (ex.Data.Values.Count == 0)
+                int cBad = ex.Data.Values.Count;
+                if (cBad == 0)
                 {
                     MessageBox.Show(this, ex.Message, "Error");
                 }
                 else
                 {
+                    string errorMessage = $"{copiedCount} of {cTotal} files were actually copied.";
+                    if (cBad> 0) errorMessage += $"  {cBad} file{(cBad > 1 ? "s " : "")} did not exist.";
+                    errorMessage += "\r\n\n";
                     foreach (FileListEntry f in (List<FileListEntry>) ex.Data["BadList"])
                     {
-                        s += $"Row {f.RowNumber}: {f.ExistingFilename}\r\n";
+                        errorMessage += $"Row {f.RowNumber}: {f.ExistingFilename}\r\n";
                     }
 
                     using (FrmError frm = new FrmError())
                     {
-                        frm.TestMode = !chkContinue.Checked;
-                        frm.ErrorMessage = s;
+                        frm.ErrorMessage = errorMessage;
                         frm.ShowDialog();
                     }
                 }

@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Boundless.ReNamer.Properties;
-using static System.String;
-using static Boundless.ReNamer.Properties.Settings;
+using static Ideal.ReNamer.Properties.Settings;
 
-namespace Boundless.ReNamer
+namespace Ideal.ReNamer
 {
     public class Renamer
     {
@@ -61,9 +59,9 @@ namespace Boundless.ReNamer
             bool en;
             try
             {
-                en = !IsNullOrEmpty(src);
-                en = en && !IsNullOrEmpty(dest);
-                en = en && !IsNullOrEmpty(file);
+                en = !String.IsNullOrEmpty(src);
+                en = en && !String.IsNullOrEmpty(dest);
+                en = en && !String.IsNullOrEmpty(file);
                 if (en)
                 {
                     en = new DirectoryInfo(src).Exists;
@@ -81,31 +79,38 @@ namespace Boundless.ReNamer
         /// <summary>
         /// Copies files listed in the Excel worksheet specified by wbkFileName from the sourceFolder to the destFolder
         /// </summary>
-        /// <param name="sourceFolder"></param>
-        /// <param name="destFolder"></param>
-        /// <param name="wbkFilename"></param>
-        /// <param name="continueOnError"></param>
-        /// <param name="hasHeaders"></param>
-        /// <returns>Number of files which were copied.</returns>
+        /// <param name="sourceFolder">Source Folder containng files to be processed.</param>
+        /// <param name="destFolder">Destination Folder.  Can be the same value as the Source Folder if renaming in place is desired.</param>
+        /// <param name="wbkFilename">The filename of an Excel workbook containing filenames to be processed.</param>
+        /// <param name="continueOnError">Test Mode.  False= supress copying to destination.</param>
+        /// <param name="hasHeaders">True if a header row is expected to be in row one of the Excel document.</param>
+        /// <param name="rowCount">The number of rows found in the Excel spreadsheet.</param>
+        /// <param name="copiedCount">The number of files which were actually copied.</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ApplicationException"></exception>
-        public int CopyFiles(string sourceFolder, string destFolder, string wbkFilename, bool continueOnError, bool hasHeaders)
+        public void CopyFiles(string sourceFolder, string destFolder, string wbkFilename, bool continueOnError, bool hasHeaders, ref int rowCount, ref int copiedCount)
         {
-            int ret = 0;
+         
             string s = "Value cannot be null or empty.";
-            if (IsNullOrEmpty(sourceFolder))
+            if (String.IsNullOrEmpty(sourceFolder))
                 throw new ArgumentException(s,nameof(sourceFolder));
-            if (IsNullOrEmpty(destFolder))
+            if (String.IsNullOrEmpty(destFolder))
                 throw new ArgumentException(s,nameof(destFolder));
-            if (IsNullOrEmpty(wbkFilename))
+            if (String.IsNullOrEmpty(wbkFilename))
                 throw new ArgumentException(s,nameof(wbkFilename));
+
+            if (new DirectoryInfo(sourceFolder).GetFileSystemInfos("*.*").Length == 0)
+                throw new ApplicationException($"No Files were found in the source folder {sourceFolder} !");
+
             DirectoryInfo diDestination = new DirectoryInfo(destFolder);
 
             if (!diDestination.Exists) diDestination.Create();
 
             Dictionary<int, string> excel = ExcelProcessor.ImportOfficeOpenXmlWorkbook(wbkFilename, hasHeaders);
+            rowCount = excel.Count;
             List<FileListEntry> fiBadList = new List<FileListEntry>();
             SourceFolder = sourceFolder;
+
             DestFolder = destFolder;
             WorkbookFilename = wbkFilename;
             string cellA1 = excel.First().Value.Split('|')[0];
@@ -141,8 +146,8 @@ namespace Boundless.ReNamer
                     if (continueOnError)
                     {
                         File.Copy(fi.FullName, e.NewNameInDestinationFolder, true);
+                        copiedCount++;
                     }
-                    ret++;
                 }
                 else
                 {
@@ -157,7 +162,6 @@ namespace Boundless.ReNamer
                 ex.Data.Add("BadList", fiBadList);
                 throw ex;
             }
-            return ret;
         }
     }
 }

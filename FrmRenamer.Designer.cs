@@ -1,4 +1,4 @@
-﻿namespace Boundless.ReNamer
+﻿namespace Ideal.ReNamer
 {
     partial class FrmRenamer
     {
@@ -113,13 +113,14 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tlp.SetColumnSpan(this.tbxSourceFolder, 2);
-            this.tbxSourceFolder.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Boundless.ReNamer.Properties.Settings.Default, "SourceFolder", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.tbxSourceFolder.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Ideal.ReNamer.Properties.Settings.Default, "SourceFolder", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.tbxSourceFolder.Location = new System.Drawing.Point(18, 32);
             this.tbxSourceFolder.Margin = new System.Windows.Forms.Padding(5);
             this.tbxSourceFolder.Name = "tbxSourceFolder";
             this.tbxSourceFolder.Size = new System.Drawing.Size(801, 22);
             this.tbxSourceFolder.TabIndex = 2;
-            this.tbxSourceFolder.Text = global::Boundless.ReNamer.Properties.Settings.Default.SourceFolder;
+           
+            this.tbxSourceFolder.Text = global::Ideal.ReNamer.Properties.Settings.Default.SourceFolder;
             this.tbxSourceFolder.TextChanged += new System.EventHandler(this.TextChanging);
             // 
             // tbxDestFolder
@@ -128,13 +129,13 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tlp.SetColumnSpan(this.tbxDestFolder, 2);
-            this.tbxDestFolder.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Boundless.ReNamer.Properties.Settings.Default, "DestFolder", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.tbxDestFolder.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Ideal.ReNamer.Properties.Settings.Default, "DestFolder", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.tbxDestFolder.Location = new System.Drawing.Point(18, 77);
             this.tbxDestFolder.Margin = new System.Windows.Forms.Padding(5);
             this.tbxDestFolder.Name = "tbxDestFolder";
             this.tbxDestFolder.Size = new System.Drawing.Size(801, 22);
             this.tbxDestFolder.TabIndex = 3;
-            this.tbxDestFolder.Text = global::Boundless.ReNamer.Properties.Settings.Default.DestFolder;
+            this.tbxDestFolder.Text = global::Ideal.ReNamer.Properties.Settings.Default.DestFolder;
             this.tbxDestFolder.TextChanged += new System.EventHandler(this.TextChanging);
             // 
             // btnFindSourceFolder
@@ -179,13 +180,13 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tlp.SetColumnSpan(this.tbxWorkbookFilename, 2);
-            this.tbxWorkbookFilename.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Boundless.ReNamer.Properties.Settings.Default, "WorkbookFilename", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.tbxWorkbookFilename.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Ideal.ReNamer.Properties.Settings.Default, "WorkbookFilename", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.tbxWorkbookFilename.Location = new System.Drawing.Point(18, 122);
             this.tbxWorkbookFilename.Margin = new System.Windows.Forms.Padding(5);
             this.tbxWorkbookFilename.Name = "tbxWorkbookFilename";
             this.tbxWorkbookFilename.Size = new System.Drawing.Size(801, 22);
             this.tbxWorkbookFilename.TabIndex = 7;
-            this.tbxWorkbookFilename.Text = global::Boundless.ReNamer.Properties.Settings.Default.WorkbookFilename;
+            this.tbxWorkbookFilename.Text = global::Ideal.ReNamer.Properties.Settings.Default.WorkbookFilename;
             this.tbxWorkbookFilename.TextChanged += new System.EventHandler(this.TextChanging);
             // 
             // lblDirections

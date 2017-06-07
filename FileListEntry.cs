@@ -1,4 +1,4 @@
-namespace Boundless.ReNamer
+namespace Ideal.ReNamer
 {
     public class FileListEntry
     {

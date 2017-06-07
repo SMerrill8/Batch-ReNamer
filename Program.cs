@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Boundless.ReNamer
+namespace Ideal.ReNamer
 {
     static class Program
     {
