@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using static Ideal.ReNamer.Properties.Settings;
+using static System.String;
 
 namespace Ideal.ReNamer
 {
@@ -12,24 +14,63 @@ namespace Ideal.ReNamer
         {
             InitializeComponent();
             _renamer = new Renamer();
+            SourceFolder = Default.SourceFolder;
+            DestinationFolder = Default.DestFolder;
+            WorkbookFilename = Default.WorkbookFilename;
         }
 
         private readonly Renamer _renamer;
 
         #region Properties
 
+        public string SourceFolder
+        {
+            get { return tbxSourceFolder.Text; }
+            set { tbxSourceFolder.Text = value; }
+        }
+
+        public string DestinationFolder
+        {
+            get { return tbxDestFolder.Text; }
+            set { tbxDestFolder.Text = value; }
+        }
+
+        public string WorkbookFilename
+        {
+            get { return tbxWorkbookFilename.Text; }
+            set { tbxWorkbookFilename.Text = value; }
+        }
+
+        public bool HasHeaders
+        {
+            get { return chkHasHeaders.Checked; }
+            set { chkHasHeaders.Checked = value; }
+        }
+
+        public bool ContinueOnError
+        {
+            get { return chkContinue.Checked; }
+            set { chkContinue.Checked = value; }
+        }
+
+        public bool CreateZip
+        {
+            get { return chkMakeZips.Checked; }
+            set { chkMakeZips.Checked = value; }
+        }
+
         public Renamer Renamer => _renamer;
 
         #endregion
 
-        #region Helper Methods
+        #region Methods
 
-        private void FindSourceFolder()
+        public void FindSourceFolder()
         {
             ctlFolderBrowserDialogSource.Description = "Locate Source Folder";
             ctlFolderBrowserDialogSource.ShowNewFolderButton = false;
             string t = tbxSourceFolder.Text;
-            if (!String.IsNullOrEmpty(t))
+            if (!IsNullOrEmpty(t))
             {
                 DirectoryInfo di = new DirectoryInfo(t);
                 if (di.Exists)
@@ -37,19 +78,17 @@ namespace Ideal.ReNamer
                     ctlFolderBrowserDialogSource.SelectedPath = di.FullName;
                 }
             }
-            if (ctlFolderBrowserDialogSource.ShowDialog(this).Equals(DialogResult.OK))
-            {
-                Renamer.SourceFolder = ctlFolderBrowserDialogSource.SelectedPath;
-                EnableControls();
-            }
+            if (!ctlFolderBrowserDialogSource.ShowDialog(this).Equals(DialogResult.OK)) return;
+            Renamer.SourceFolder = ctlFolderBrowserDialogSource.SelectedPath;
+            EnableControls();
         }
 
-        private void FindDestinationFolder()
+        public void FindDestinationFolder()
         {
             ctlFolderBrowserDialogDest.Description = "Locate Destination Folder";
             ctlFolderBrowserDialogDest.ShowNewFolderButton = true;
             string t = tbxDestFolder.Text;
-            if (!String.IsNullOrEmpty(t))
+            if (!IsNullOrEmpty(t))
             {
                 DirectoryInfo di = new DirectoryInfo(t);
                 if (di.Exists)
@@ -57,22 +96,20 @@ namespace Ideal.ReNamer
                     ctlFolderBrowserDialogDest.SelectedPath = di.FullName;
                 }
             }
-            if (ctlFolderBrowserDialogDest.ShowDialog(this).Equals(DialogResult.OK))
-            {
-                Renamer.DestFolder = ctlFolderBrowserDialogDest.SelectedPath;
-                EnableControls();
-            }
+            if (!ctlFolderBrowserDialogDest.ShowDialog(this).Equals(DialogResult.OK)) return;
+            Renamer.DestFolder = ctlFolderBrowserDialogDest.SelectedPath;
+            EnableControls();
         }
 
-        private void FindExcelFile()
+        public void FindExcelFile()
         {
             string t = tbxWorkbookFilename.Text;
             ctlOpenFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            if (!String.IsNullOrEmpty(t))
+            if (!IsNullOrEmpty(t))
             {
                 try
                 {
-                    var fi = new FileInfo(t);
+                    FileInfo fi = new FileInfo(t);
                     if (fi.Exists)
                     {
                         ctlOpenFileDialog.FileName = t;
@@ -80,7 +117,7 @@ namespace Ideal.ReNamer
                     }
                     else
                     {
-                        var di = new DirectoryInfo(t);
+                        DirectoryInfo di = new DirectoryInfo(t);
                         if (di.Exists)
                             ctlOpenFileDialog.InitialDirectory = di.FullName;
                     }
@@ -90,14 +127,12 @@ namespace Ideal.ReNamer
                     // intentional walk
                 }
             }
-            if (ctlOpenFileDialog.ShowDialog(this).Equals(DialogResult.OK))
-            {
-                Renamer.WorkbookFilename = ctlOpenFileDialog.FileName;
-                EnableControls();
-            }
+            if (!ctlOpenFileDialog.ShowDialog(this).Equals(DialogResult.OK)) return;
+            Renamer.WorkbookFilename = ctlOpenFileDialog.FileName;
+            EnableControls();
         }
 
-        private void Run()
+        public void Run()
         {
             if (tbxSourceFolder.Text.Equals(tbxDestFolder.Text))
             {
@@ -121,6 +156,7 @@ namespace Ideal.ReNamer
                     tbxWorkbookFilename.Text,
                     chkContinue.Checked, 
                     chkHasHeaders.Checked,
+                    chkMakeZips.Checked,
                     ref cTotal,
                     ref copiedCount
                 );
@@ -129,31 +165,38 @@ namespace Ideal.ReNamer
                 MessageBox.Show(
                     chkContinue.Checked
                         ? $"{copiedCount} of {cTotal} files were copied successfully."
-                        : $"All {cTotal} files existed, but none were copied.\r\nCheck \"Continue on Error\" to actually copy the files."
+                        : $"All {cTotal} files existed, but none were copied.\r\n" 
+                        + $"Check \"Continue on Error\" to actually copy the files."
                 );
             }
             catch (ApplicationException ex)
             {
-                int cBad = ex.Data.Values.Count;
-                if (cBad == 0)
+                int cBad = 0;
+                List<FileListEntry> bad = ex.Data["BadList"] as List<FileListEntry>;
+                if (bad != null) cBad = bad.Count;
+
+                //Compose and show exception message in FrmError:
+                StringBuilder sb = new StringBuilder();
+                if (cBad > 0)
                 {
-                    MessageBox.Show(this, ex.Message, "Error");
+                    sb.Append($"{copiedCount} of {cTotal} files were actually copied.");
+                    sb.Append(cBad > 0
+                        ? $"  {cBad} file{(cBad > 1 ? "s " : "")} did not exist."
+                        : "");
+                    sb.Append("\r\n\n");
+                    foreach (FileListEntry f in (List<FileListEntry>) ex.Data["BadList"])
+                    {
+                        sb.Append($"Row {f.RowNumber}: {f.ExistingFilename}\r\n");
+                    }
                 }
                 else
                 {
-                    string errorMessage = $"{copiedCount} of {cTotal} files were actually copied.";
-                    if (cBad> 0) errorMessage += $"  {cBad} file{(cBad > 1 ? "s " : "")} did not exist.";
-                    errorMessage += "\r\n\n";
-                    foreach (FileListEntry f in (List<FileListEntry>) ex.Data["BadList"])
-                    {
-                        errorMessage += $"Row {f.RowNumber}: {f.ExistingFilename}\r\n";
-                    }
-
-                    using (FrmError frm = new FrmError())
-                    {
-                        frm.ErrorMessage = errorMessage;
-                        frm.ShowDialog();
-                    }
+                    sb.Append(ex.Message);
+                }
+                using (FrmError frm = new FrmError())
+                {
+                    frm.ErrorMessage = sb.ToString();
+                    frm.ShowDialog();
                 }
             }
             finally
@@ -218,5 +261,6 @@ namespace Ideal.ReNamer
         }
 
         #endregion
+
     }
 }

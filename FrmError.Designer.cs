@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmError));
             this.tlp = new System.Windows.Forms.TableLayoutPanel();
             this.tbxError = new System.Windows.Forms.TextBox();
             this.ctlRightMouseMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -79,12 +80,12 @@
             this.ctlRightMouseMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnuCopy});
             this.ctlRightMouseMenu.Name = "ctlRightMouseMenu";
-            this.ctlRightMouseMenu.Size = new System.Drawing.Size(160, 28);
+            this.ctlRightMouseMenu.Size = new System.Drawing.Size(166, 30);
             // 
             // mnuCopy
             // 
             this.mnuCopy.Name = "mnuCopy";
-            this.mnuCopy.Size = new System.Drawing.Size(159, 24);
+            this.mnuCopy.Size = new System.Drawing.Size(165, 26);
             this.mnuCopy.Text = "&Copy (Ctl-C)";
             this.mnuCopy.Click += new System.EventHandler(this.mnuCopy_Click);
             // 
@@ -112,6 +113,7 @@
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FrmError";
             this.Text = "Errors";

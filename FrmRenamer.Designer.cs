@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmRenamer));
             this.tlp = new System.Windows.Forms.TableLayoutPanel();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnRun = new System.Windows.Forms.Button();
@@ -40,6 +41,7 @@
             this.lblDirections = new System.Windows.Forms.Label();
             this.chkContinue = new System.Windows.Forms.CheckBox();
             this.chkHasHeaders = new System.Windows.Forms.CheckBox();
+            this.chkMakeZips = new System.Windows.Forms.CheckBox();
             this.ctlFolderBrowserDialogSource = new System.Windows.Forms.FolderBrowserDialog();
             this.ctlOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.ctlFolderBrowserDialogDest = new System.Windows.Forms.FolderBrowserDialog();
@@ -48,35 +50,36 @@
             // 
             // tlp
             // 
-            this.tlp.ColumnCount = 5;
+            this.tlp.ColumnCount = 6;
             this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 13F));
             this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 280F));
-            this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 142F));
-            this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-            this.tlp.Controls.Add(this.btnCancel, 1, 6);
-            this.tlp.Controls.Add(this.btnRun, 3, 6);
+            this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 17F));
+            this.tlp.Controls.Add(this.btnCancel, 1, 5);
+            this.tlp.Controls.Add(this.btnRun, 4, 5);
             this.tlp.Controls.Add(this.tbxSourceFolder, 1, 1);
             this.tlp.Controls.Add(this.tbxDestFolder, 1, 2);
-            this.tlp.Controls.Add(this.btnFindSourceFolder, 3, 1);
-            this.tlp.Controls.Add(this.btnFindDestFolder, 3, 2);
-            this.tlp.Controls.Add(this.btnExcelFile, 3, 3);
+            this.tlp.Controls.Add(this.btnFindSourceFolder, 4, 1);
+            this.tlp.Controls.Add(this.btnFindDestFolder, 4, 2);
+            this.tlp.Controls.Add(this.btnExcelFile, 4, 3);
             this.tlp.Controls.Add(this.tbxWorkbookFilename, 1, 3);
             this.tlp.Controls.Add(this.lblDirections, 1, 0);
             this.tlp.Controls.Add(this.chkContinue, 2, 4);
             this.tlp.Controls.Add(this.chkHasHeaders, 1, 4);
+            this.tlp.Controls.Add(this.chkMakeZips, 3, 4);
             this.tlp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp.Location = new System.Drawing.Point(0, 0);
             this.tlp.Margin = new System.Windows.Forms.Padding(5);
             this.tlp.Name = "tlp";
-            this.tlp.RowCount = 7;
+            this.tlp.RowCount = 6;
             this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
             this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
             this.tlp.Size = new System.Drawing.Size(982, 285);
             this.tlp.TabIndex = 0;
             // 
@@ -85,10 +88,10 @@
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(18, 239);
+            this.btnCancel.Location = new System.Drawing.Point(18, 245);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(5);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(125, 41);
+            this.btnCancel.Size = new System.Drawing.Size(125, 35);
             this.btnCancel.TabIndex = 0;
             this.btnCancel.Text = "Close";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -98,10 +101,10 @@
             // 
             this.btnRun.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnRun.Enabled = false;
-            this.btnRun.Location = new System.Drawing.Point(829, 239);
+            this.btnRun.Location = new System.Drawing.Point(828, 245);
             this.btnRun.Margin = new System.Windows.Forms.Padding(5);
             this.btnRun.Name = "btnRun";
-            this.btnRun.Size = new System.Drawing.Size(132, 41);
+            this.btnRun.Size = new System.Drawing.Size(132, 35);
             this.btnRun.TabIndex = 1;
             this.btnRun.Text = "&Run";
             this.btnRun.UseVisualStyleBackColor = true;
@@ -112,15 +115,12 @@
             this.tbxSourceFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tlp.SetColumnSpan(this.tbxSourceFolder, 2);
-            this.tbxSourceFolder.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Ideal.ReNamer.Properties.Settings.Default, "SourceFolder", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.tlp.SetColumnSpan(this.tbxSourceFolder, 3);
             this.tbxSourceFolder.Location = new System.Drawing.Point(18, 32);
             this.tbxSourceFolder.Margin = new System.Windows.Forms.Padding(5);
             this.tbxSourceFolder.Name = "tbxSourceFolder";
-            this.tbxSourceFolder.Size = new System.Drawing.Size(801, 22);
+            this.tbxSourceFolder.Size = new System.Drawing.Size(800, 22);
             this.tbxSourceFolder.TabIndex = 2;
-           
-            this.tbxSourceFolder.Text = global::Ideal.ReNamer.Properties.Settings.Default.SourceFolder;
             this.tbxSourceFolder.TextChanged += new System.EventHandler(this.TextChanging);
             // 
             // tbxDestFolder
@@ -128,20 +128,18 @@
             this.tbxDestFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tlp.SetColumnSpan(this.tbxDestFolder, 2);
-            this.tbxDestFolder.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Ideal.ReNamer.Properties.Settings.Default, "DestFolder", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.tlp.SetColumnSpan(this.tbxDestFolder, 3);
             this.tbxDestFolder.Location = new System.Drawing.Point(18, 77);
             this.tbxDestFolder.Margin = new System.Windows.Forms.Padding(5);
             this.tbxDestFolder.Name = "tbxDestFolder";
-            this.tbxDestFolder.Size = new System.Drawing.Size(801, 22);
+            this.tbxDestFolder.Size = new System.Drawing.Size(800, 22);
             this.tbxDestFolder.TabIndex = 3;
-            this.tbxDestFolder.Text = global::Ideal.ReNamer.Properties.Settings.Default.DestFolder;
             this.tbxDestFolder.TextChanged += new System.EventHandler(this.TextChanging);
             // 
             // btnFindSourceFolder
             // 
             this.btnFindSourceFolder.Dock = System.Windows.Forms.DockStyle.Right;
-            this.btnFindSourceFolder.Location = new System.Drawing.Point(829, 32);
+            this.btnFindSourceFolder.Location = new System.Drawing.Point(828, 32);
             this.btnFindSourceFolder.Margin = new System.Windows.Forms.Padding(5);
             this.btnFindSourceFolder.Name = "btnFindSourceFolder";
             this.btnFindSourceFolder.Size = new System.Drawing.Size(132, 35);
@@ -153,7 +151,7 @@
             // btnFindDestFolder
             // 
             this.btnFindDestFolder.Dock = System.Windows.Forms.DockStyle.Right;
-            this.btnFindDestFolder.Location = new System.Drawing.Point(829, 77);
+            this.btnFindDestFolder.Location = new System.Drawing.Point(828, 77);
             this.btnFindDestFolder.Margin = new System.Windows.Forms.Padding(5);
             this.btnFindDestFolder.Name = "btnFindDestFolder";
             this.btnFindDestFolder.Size = new System.Drawing.Size(132, 35);
@@ -165,7 +163,7 @@
             // btnExcelFile
             // 
             this.btnExcelFile.Dock = System.Windows.Forms.DockStyle.Right;
-            this.btnExcelFile.Location = new System.Drawing.Point(829, 122);
+            this.btnExcelFile.Location = new System.Drawing.Point(828, 122);
             this.btnExcelFile.Margin = new System.Windows.Forms.Padding(5);
             this.btnExcelFile.Name = "btnExcelFile";
             this.btnExcelFile.Size = new System.Drawing.Size(132, 35);
@@ -179,20 +177,18 @@
             this.tbxWorkbookFilename.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tlp.SetColumnSpan(this.tbxWorkbookFilename, 2);
-            this.tbxWorkbookFilename.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Ideal.ReNamer.Properties.Settings.Default, "WorkbookFilename", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.tlp.SetColumnSpan(this.tbxWorkbookFilename, 3);
             this.tbxWorkbookFilename.Location = new System.Drawing.Point(18, 122);
             this.tbxWorkbookFilename.Margin = new System.Windows.Forms.Padding(5);
             this.tbxWorkbookFilename.Name = "tbxWorkbookFilename";
-            this.tbxWorkbookFilename.Size = new System.Drawing.Size(801, 22);
+            this.tbxWorkbookFilename.Size = new System.Drawing.Size(800, 22);
             this.tbxWorkbookFilename.TabIndex = 7;
-            this.tbxWorkbookFilename.Text = global::Ideal.ReNamer.Properties.Settings.Default.WorkbookFilename;
             this.tbxWorkbookFilename.TextChanged += new System.EventHandler(this.TextChanging);
             // 
             // lblDirections
             // 
             this.lblDirections.AutoSize = true;
-            this.tlp.SetColumnSpan(this.lblDirections, 2);
+            this.tlp.SetColumnSpan(this.lblDirections, 3);
             this.lblDirections.Dock = System.Windows.Forms.DockStyle.Left;
             this.lblDirections.Location = new System.Drawing.Point(16, 0);
             this.lblDirections.Name = "lblDirections";
@@ -225,6 +221,18 @@
             this.chkHasHeaders.Text = "First row contains headers?";
             this.chkHasHeaders.UseVisualStyleBackColor = true;
             // 
+            // chkMakeZips
+            // 
+            this.chkMakeZips.AutoSize = true;
+            this.chkMakeZips.Checked = true;
+            this.chkMakeZips.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkMakeZips.Location = new System.Drawing.Point(561, 165);
+            this.chkMakeZips.Name = "chkMakeZips";
+            this.chkMakeZips.Size = new System.Drawing.Size(104, 21);
+            this.chkMakeZips.TabIndex = 12;
+            this.chkMakeZips.Text = "Create Zip?";
+            this.chkMakeZips.UseVisualStyleBackColor = true;
+            // 
             // ctlFolderBrowserDialogSource
             // 
             this.ctlFolderBrowserDialogSource.RootFolder = System.Environment.SpecialFolder.MyComputer;
@@ -239,10 +247,10 @@
             this.ClientSize = new System.Drawing.Size(982, 285);
             this.Controls.Add(this.tlp);
             this.DoubleBuffered = true;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(5);
             this.MinimumSize = new System.Drawing.Size(1000, 330);
             this.Name = "FrmRenamer";
-            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Batch ReNamer";
             this.Load += new System.EventHandler(this.FrmRenamer_Load);
@@ -270,6 +278,7 @@
         private System.Windows.Forms.Label lblDirections;
         private System.Windows.Forms.CheckBox chkHasHeaders;
         private System.Windows.Forms.CheckBox chkContinue;
+        private System.Windows.Forms.CheckBox chkMakeZips;
     }
 }
 
