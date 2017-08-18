@@ -80,6 +80,7 @@ namespace Ideal.ReNamer
             }
             if (!ctlFolderBrowserDialogSource.ShowDialog(this).Equals(DialogResult.OK)) return;
             Renamer.SourceFolder = ctlFolderBrowserDialogSource.SelectedPath;
+            SourceFolder = Renamer.SourceFolder;
             EnableControls();
         }
 
@@ -98,6 +99,7 @@ namespace Ideal.ReNamer
             }
             if (!ctlFolderBrowserDialogDest.ShowDialog(this).Equals(DialogResult.OK)) return;
             Renamer.DestFolder = ctlFolderBrowserDialogDest.SelectedPath;
+            DestinationFolder = Renamer.DestFolder;
             EnableControls();
         }
 
@@ -129,6 +131,7 @@ namespace Ideal.ReNamer
             }
             if (!ctlOpenFileDialog.ShowDialog(this).Equals(DialogResult.OK)) return;
             Renamer.WorkbookFilename = ctlOpenFileDialog.FileName;
+            WorkbookFilename = Renamer.WorkbookFilename;
             EnableControls();
         }
 
