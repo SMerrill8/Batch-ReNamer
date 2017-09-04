@@ -65,11 +65,11 @@ namespace Ideal.ReNamer
             {
                 List<string> b = GetRow(sheet, r++, leftCol, rightCol);
                 // determine when we are done reading rows:
-                if (b.Count == 0)
+                if (b.Count != 2)
                 {
                     done = true;
                 }
-                else if (String.IsNullOrEmpty(b[1])) // source filename is empty
+                else if (string.IsNullOrEmpty(b[1])) // source filename is empty
                 {
                     done = true;
                 }
