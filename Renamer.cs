@@ -74,7 +74,7 @@ namespace Ideal.ReNamer
                 if (en)
                 {
                     en = new DirectoryInfo(src).Exists;
-                    en = en && new DirectoryInfo(dest).Exists;
+                  //  en = en && new DirectoryInfo(dest).Exists;
                     en = en && new FileInfo(file).Exists;
                 }
             }
@@ -94,8 +94,7 @@ namespace Ideal.ReNamer
         /// <param name="continueOnError">Test Mode.  False= supress copying to destination.</param>
         /// <param name="hasHeaders">True if a header row is expected to be in row one of the Excel document.</param>
         /// <param name="makeZips">True causes a zip file to be made.</param>
-        /// <param name="rowCount">The number of rows found in the Excel spreadsheet.</param>
-        /// <param name="copiedCount">The number of files which were actually copied.</param>
+        /// <param name="fiList">A list of every result, whether copied or not.</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ApplicationException"></exception>
         /// <exception cref="PathTooLongException"></exception>
@@ -103,15 +102,15 @@ namespace Ideal.ReNamer
         /// <exception cref="IOException"></exception>
         public void CopyFiles(string sourceFolder, string destFolder, string wbkFilename, 
             bool continueOnError, bool hasHeaders, bool makeZips, 
-            ref int rowCount, ref int copiedCount)
+            ref List<FileListEntry> fiList)
         {
-            const string MESSAGE = "Value cannot be null or empty.";
+            const string MESSAGE = "Value cannot be null or empty.";      
             if (IsNullOrEmpty(sourceFolder))
-                throw new ArgumentException(MESSAGE,nameof(sourceFolder));
+                throw new ArgumentException(MESSAGE, nameof(sourceFolder));
             if (IsNullOrEmpty(destFolder))
-                throw new ArgumentException(MESSAGE,nameof(destFolder));
+                throw new ArgumentException(MESSAGE, nameof(destFolder));
             if (IsNullOrEmpty(wbkFilename))
-                throw new ArgumentException(MESSAGE,nameof(wbkFilename));
+                throw new ArgumentException(MESSAGE, nameof(wbkFilename));
 
             if (new DirectoryInfo(sourceFolder).GetFileSystemInfos("*.*").Length == 0)
                 throw new ApplicationException($"No Files were found in the source folder {sourceFolder} !");
@@ -121,10 +120,10 @@ namespace Ideal.ReNamer
             if (!diDestination.Exists) diDestination.Create();
 
             Dictionary<int, string> excel = ExcelProcessor.ImportOfficeOpenXmlWorkbook(wbkFilename, hasHeaders);
-            rowCount = excel.Count;
+            int rowCount = excel.Count;
             if (rowCount == 0)
                 throw new ApplicationException($"There were no rows to process within {wbkFilename}.");
-            List<FileListEntry> fiBadList = new List<FileListEntry>();
+            
             SourceFolder = sourceFolder;
 
             DestFolder = destFolder;
@@ -155,34 +154,21 @@ namespace Ideal.ReNamer
                 {
                     if (!continueOnError) continue;
                     File.Copy(fi.FullName, e.NewNameInDestinationFolder, true);
-                    copiedCount++;
                 }
-                else
-                {
-                    fiBadList.Add(e);
-                }
+                fiList.Add(e);
             }
-            int cBad = fiBadList.Count;
-            if (cBad == 0)
-            {
-                MakeZipFiles(diDestination);
-                return;
-            }
-            ApplicationException ex = new ApplicationException(
-                $"{cBad} row{(cBad > 1 ? "s" : "")} contained non-existent files.");
-            ex.Data.Add("BadList", fiBadList);
-            throw ex;
         }
 
-        private static void MakeZipFiles(DirectoryInfo diDestination)
+        public static void MakeZipFiles(DirectoryInfo diDestination)
         {
             string dir = diDestination.Parent.FullName;
             string zipPath = $@"{dir}\{diDestination.Name}.zip";
             dir = diDestination.FullName;
+            if (File.Exists(zipPath)) File.Delete(zipPath);
             ZipFile.CreateFromDirectory(dir, zipPath);
             string destZipPath = $@"{dir}\{diDestination.Name}.zip";
+            if (File.Exists(destZipPath)) File.Delete(destZipPath);
             File.Move(zipPath,destZipPath);
-
         }
     }
 }

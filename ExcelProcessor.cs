@@ -6,8 +6,7 @@ using OfficeOpenXml;
 namespace Ideal.ReNamer
 {
     /// <summary>
-    /// ExcelProcessor is responsible for interfacing with MS Excel.  All of the data 
-    /// coming from and to Hydromax USA is currently done by exchanging Excel spreadsheets.
+    /// ExcelProcessor is responsible for interfacing with MS Excel.
     /// </summary>
     public class ExcelProcessor
     {
@@ -31,11 +30,11 @@ namespace Ideal.ReNamer
                     ExcelWorksheet sheet = package.Workbook.Worksheets[1];
 
                     int topRow = startRow;
-                    const string leftCol = "A"; // Original Filename
-                    const string rightCol = "B"; // New Filename
+                    const string LEFT_COL = "A"; // Original Filename
+                    const string RIGHT_COL = "B"; // New Filename
                     if (!hasHeaders) topRow--;
 
-                    List<List<string>> outRange = GetValuesFromRange(sheet, leftCol, topRow, rightCol);
+                    List<List<string>> outRange = GetValuesFromRange(sheet, LEFT_COL, topRow, RIGHT_COL);
 
                     for (index = 0; index < outRange.Count; index++)
                     {

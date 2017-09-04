@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using static Ideal.ReNamer.Properties.Settings;
@@ -137,6 +138,7 @@ namespace Ideal.ReNamer
 
         public void Run()
         {
+            StringBuilder sb = new StringBuilder();  // use sb to return the results
             if (tbxSourceFolder.Text.Equals(tbxDestFolder.Text))
             {
                 DialogResult r =  MessageBox.Show(
@@ -147,63 +149,57 @@ namespace Ideal.ReNamer
                 if (r == DialogResult.Cancel)
                     return;
             }
-            int cTotal = 0;
-            int copiedCount = 0;
+            List<FileListEntry> gb = new List<FileListEntry>();
             try
             {
                 UseWaitCursor = true;
                 btnRun.Enabled = false;
                 Renamer.CopyFiles(
-                    tbxSourceFolder.Text, 
-                    tbxDestFolder.Text, 
+                    tbxSourceFolder.Text,
+                    tbxDestFolder.Text,
                     tbxWorkbookFilename.Text,
-                    chkContinue.Checked, 
+                    chkContinue.Checked,
                     chkHasHeaders.Checked,
                     chkMakeZips.Checked,
-                    ref cTotal,
-                    ref copiedCount
+                    ref gb
                 );
-                EnableControls();
-                UseWaitCursor = false;
-                MessageBox.Show(
-                    chkContinue.Checked
-                        ? $"{copiedCount} of {cTotal} files were copied successfully."
-                        : $"All {cTotal} files existed, but none were copied.\r\n" 
-                        + $"Check \"Continue on Error\" to actually copy the files."
-                );
-            }
-            catch (ApplicationException ex)
-            {
-                int cBad = 0;
-                List<FileListEntry> bad = ex.Data["BadList"] as List<FileListEntry>;
-                if (bad != null) cBad = bad.Count;
-
-                //Compose and show exception message in FrmError:
-                StringBuilder sb = new StringBuilder();
-                if (cBad > 0)
+                int cTotal = gb.Count;
+                int cBad = gb.Count(x => !x.ExistingFileExists);
+                int cGood = gb.Count - cBad;
+                if (cBad == 0)
                 {
-                    sb.Append($"{copiedCount} of {cTotal} files were actually copied.");
-                    sb.Append(cBad > 0
-                        ? $"  {cBad} file{(cBad > 1 ? "s " : "")} did not exist."
-                        : "");
-                    sb.Append("\r\n\n");
-                    foreach (FileListEntry f in (List<FileListEntry>) ex.Data["BadList"])
-                    {
-                        sb.Append($"Row {f.RowNumber}: {f.ExistingFilename}\r\n");
-                    }
+                    DirectoryInfo diDestination = new DirectoryInfo(tbxDestFolder.Text);
+                    Renamer.MakeZipFiles(diDestination);
                 }
                 else
                 {
-                    sb.Append(ex.Message);
+                    sb.Append($"ERROR: {cBad} row{(cBad > 1 ? "s contain" : " contains")} non-existent files.\r\n\r\n");
                 }
-                using (FrmError frm = new FrmError())
+
+                sb.Append($"The first row {(chkHasHeaders.Checked ? "contains": "does not contain")} headers; ");
+                sb.Append(
+                    chkContinue.Checked
+                        ? $"{cGood} of {cTotal} files were copied successfully.\r\n\n"
+                        : $"No files were actually copied.\r\nCheck \"Continue on Error\" to actually copy the files.\r\n\n");
+                foreach (FileListEntry f  in gb)
                 {
-                    frm.ErrorMessage = sb.ToString();
-                    frm.ShowDialog();
+                    string sExists = $"\r\n{(f.ExistingFileExists ? "" : "  FAILED: File does not exist\r\n\r\n")}";
+                    sb.Append(
+                        $"Row {f.RowNumber}: COPY \"{f.ExistingFilename}\" \"{f.NewNameInDestinationFolder}\":{sExists}");
                 }
+            }
+            catch (ApplicationException ex)
+            {
+                sb.Append("Exception:");
+                sb.Append(ex.Message);
             }
             finally
             {
+                using (FrmResult frm = new FrmResult())
+                {
+                    frm.Message = sb.ToString();
+                    frm.ShowDialog();
+                }
                 EnableControls();
                 UseWaitCursor = false;
             }
