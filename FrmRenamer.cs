@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,14 +12,19 @@ namespace Ideal.ReNamer
 {
     public partial class FrmRenamer : Form
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public FrmRenamer()
         {
             InitializeComponent();
             _renamer = new Renamer();
-            SourceFolder = Default.SourceFolder;
-            DestinationFolder = Default.DestFolder;
-            WorkbookFilename = Default.WorkbookFilename;
+            InitializeWorkbookFilenames(Renamer.WorkbookFilenames);
+            SourceFolder = Renamer.SourceFolder;
+            DestinationFolder = Renamer.DestFolder;
         }
+
+
 
         private readonly Renamer _renamer;
 
@@ -33,14 +39,12 @@ namespace Ideal.ReNamer
         public string DestinationFolder
         {
             get { return tbxDestFolder.Text; }
-            set { tbxDestFolder.Text = value; }
+            set
+            {
+                tbxDestFolder.Text = value;
+            }
         }
 
-        public string WorkbookFilename
-        {
-            get { return tbxWorkbookFilename.Text; }
-            set { tbxWorkbookFilename.Text = value; }
-        }
 
         public bool HasHeaders
         {
@@ -65,6 +69,38 @@ namespace Ideal.ReNamer
         #endregion
 
         #region Methods
+
+        private void AddWorkbookFilename(string value)
+        {
+            if (!clbWorkbookFilenames.Items.Contains(value))
+                 clbWorkbookFilenames.Items.Add(value, true);
+        }
+
+        private void AddWorkbookFilenames(string[] fileNames)
+        {
+            foreach (string v in fileNames)
+            {
+                AddWorkbookFilename(v);
+            }
+        }
+        private void InitializeWorkbookFilenames(StringCollection renamerWorkbookFilenames)
+        {
+            clbWorkbookFilenames.Items.Clear();
+            foreach (string v in renamerWorkbookFilenames)
+            {
+                AddWorkbookFilename(v);
+            }
+        }
+
+        private StringCollection CheckedWorkbooks()
+        {
+            StringCollection ret = new StringCollection();
+            foreach (object checkedItem in clbWorkbookFilenames.CheckedItems)
+            {
+                ret.Add((string) checkedItem);
+            }
+            return ret;
+        }
 
         public void FindSourceFolder()
         {
@@ -104,9 +140,9 @@ namespace Ideal.ReNamer
             EnableControls();
         }
 
-        public void FindExcelFile()
+        public void AddExcelFile()
         {
-            string t = tbxWorkbookFilename.Text;
+            string t = (string) clbWorkbookFilenames.SelectedItem;
             ctlOpenFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             if (!IsNullOrEmpty(t))
             {
@@ -131,10 +167,10 @@ namespace Ideal.ReNamer
                 }
             }
             if (!ctlOpenFileDialog.ShowDialog(this).Equals(DialogResult.OK)) return;
-            Renamer.WorkbookFilename = ctlOpenFileDialog.FileName;
-            WorkbookFilename = Renamer.WorkbookFilename;
+            AddWorkbookFilenames(ctlOpenFileDialog.FileNames);
             EnableControls();
         }
+
 
         public void Run()
         {
@@ -154,22 +190,25 @@ namespace Ideal.ReNamer
             {
                 UseWaitCursor = true;
                 btnRun.Enabled = false;
-                Renamer.CopyFiles(
-                    tbxSourceFolder.Text,
-                    tbxDestFolder.Text,
-                    tbxWorkbookFilename.Text,
-                    chkContinue.Checked,
-                    chkHasHeaders.Checked,
-                    chkMakeZips.Checked,
-                    ref gb
-                );
+                foreach (string v in CheckedWorkbooks())
+                {
+                    Renamer.CopyFiles(
+                        tbxSourceFolder.Text,
+                        tbxDestFolder.Text,
+                        v,
+                        chkContinue.Checked,
+                        chkHasHeaders.Checked,
+                        chkMakeZips.Checked,
+                        ref gb
+                    );
+                }
+
                 int cTotal = gb.Count;
                 int cBad = gb.Count(x => !x.ExistingFileExists);
                 int cGood = gb.Count - cBad;
                 if (cBad == 0)
                 {
-                    DirectoryInfo diDestination = new DirectoryInfo(tbxDestFolder.Text);
-                    Renamer.MakeZipFiles(diDestination);
+
                 }
                 else
                 {
@@ -207,8 +246,7 @@ namespace Ideal.ReNamer
 
         private void EnableControls()
         {
-            btnRun.Enabled = Renamer.ArePropertiesValid(tbxSourceFolder.Text, tbxDestFolder.Text,
-                tbxWorkbookFilename.Text);
+            btnRun.Enabled = Renamer.ArePropertiesValid();
         }
 
         #endregion
@@ -227,7 +265,7 @@ namespace Ideal.ReNamer
 
         private void btnExcelFile_click(object sender, EventArgs e)
         {
-            FindExcelFile();
+            AddExcelFile();
         }
 
         private void btnRun_Click(object sender, EventArgs e)
@@ -259,7 +297,17 @@ namespace Ideal.ReNamer
             EnableControls();
         }
 
+        private void btnClearFiles_Click(object sender, EventArgs e)
+        {
+            clbWorkbookFilenames.Items.Clear();
+            _renamer.WorkbookFilenames.Clear();
+        }
+
         #endregion
 
+        private void ctlOpenFileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+        }
     }
 }

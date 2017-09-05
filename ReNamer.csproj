@@ -25,9 +25,9 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ProductName>Batch ReNamer</ProductName>
     <PublisherName>Ideal Security Inc</PublisherName>
-    <MinimumRequiredVersion>1.0.1.1</MinimumRequiredVersion>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.0.1.1</ApplicationVersion>
+    <MinimumRequiredVersion>1.0.1.2</MinimumRequiredVersion>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.0.1.2</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>

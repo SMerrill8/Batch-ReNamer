@@ -82,5 +82,16 @@ namespace Ideal.ReNamer.Properties {
                 this["WorkbookFilename"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection WorkbookFilenames {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["WorkbookFilenames"]));
+            }
+            set {
+                this["WorkbookFilenames"] = value;
+            }
+        }
     }
 }

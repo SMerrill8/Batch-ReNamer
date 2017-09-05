@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -12,15 +13,18 @@ namespace Ideal.ReNamer
     {
         private string _sourceFolder;
         private string _destFolder;
-        private string _workbookFilename;
+        private StringCollection _workbookFilenames;
 
         public bool ContinueOnBad { get; set; }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public Renamer()
         {
-            _sourceFolder = Default.SourceFolder;
-            _destFolder = Default.DestFolder;
-            _workbookFilename = Default.WorkbookFilename;
+            _sourceFolder = Default.SourceFolder ?? "";
+            _destFolder = Default.DestFolder ?? "";
+            _workbookFilenames = Default.WorkbookFilenames ?? new StringCollection();
         }
 
         public string SourceFolder
@@ -45,13 +49,16 @@ namespace Ideal.ReNamer
             }
         }
 
-        public string WorkbookFilename
+        /// <summary>
+        /// All of the filenames
+        /// </summary>
+        public StringCollection WorkbookFilenames
         {
-            get { return _workbookFilename; }
+            get { return _workbookFilenames; }
             set
             {
-                _workbookFilename = value;
-                Default.WorkbookFilename = _workbookFilename;
+                _workbookFilenames = value;
+                Default.WorkbookFilenames = _workbookFilenames;
                 Default.Save();
             }
         }
@@ -59,23 +66,22 @@ namespace Ideal.ReNamer
         /// <summary>
         /// Make sure that src, dest and file exist on disk
         /// </summary>
-        /// <param name="src"></param>
-        /// <param name="dest"></param>
-        /// <param name="file"></param>
-        /// <returns>true if all three exist</returns>
-        public bool ArePropertiesValid(string src, string dest, string file)
+        /// <returns>true if SourceFolder, and all Excel files exist, and the DestFolder is non-null.</returns>
+        public bool ArePropertiesValid()
         {
+            string src = SourceFolder;
+            StringCollection files = WorkbookFilenames;
+
             bool en;
             try
             {
                 en = !IsNullOrEmpty(src);
-                en = en && !IsNullOrEmpty(dest);
-                en = en && !IsNullOrEmpty(file);
+                en = en && !IsNullOrEmpty(DestFolder);
+                en = files.Cast<string>().Aggregate(en, (current, f) => current && !IsNullOrEmpty(f));
                 if (en)
                 {
                     en = new DirectoryInfo(src).Exists;
-                  //  en = en && new DirectoryInfo(dest).Exists;
-                    en = en && new FileInfo(file).Exists;
+                    en = files.Cast<string>().Aggregate(en, (current, f) => current && new FileInfo(f).Exists);
                 }
             }
             catch (Exception)
@@ -85,6 +91,23 @@ namespace Ideal.ReNamer
             return en;
         }
 
+        /// <summary>
+        /// Recursive folder purge
+        /// </summary>
+        /// <param name="di"></param>
+        private void PurgeFolder(DirectoryInfo di)
+        {
+            if (!di.Exists) return;
+            foreach (FileInfo f in di.GetFiles())
+            {
+                f.Delete();
+            }
+            foreach (DirectoryInfo d in di.GetDirectories())
+            {
+                PurgeFolder(d);
+            }
+            di.Delete();
+        }
         /// <summary>
         /// Copies files listed in the Excel worksheet specified by wbkFileName from the sourceFolder to the destFolder
         /// </summary>
@@ -104,6 +127,7 @@ namespace Ideal.ReNamer
             bool continueOnError, bool hasHeaders, bool makeZips, 
             ref List<FileListEntry> fiList)
         {
+            // Validate parameters:
             const string MESSAGE = "Value cannot be null or empty.";      
             if (IsNullOrEmpty(sourceFolder))
                 throw new ArgumentException(MESSAGE, nameof(sourceFolder));
@@ -111,14 +135,23 @@ namespace Ideal.ReNamer
                 throw new ArgumentException(MESSAGE, nameof(destFolder));
             if (IsNullOrEmpty(wbkFilename))
                 throw new ArgumentException(MESSAGE, nameof(wbkFilename));
-
+            
             if (new DirectoryInfo(sourceFolder).GetFileSystemInfos("*.*").Length == 0)
                 throw new ApplicationException($"No Files were found in the source folder {sourceFolder} !");
 
+            // Create Destination folder if it doesn't exist:
             DirectoryInfo diDestination = new DirectoryInfo(destFolder);
+            if (!diDestination.Exists)
+            diDestination.Create();
 
-            if (!diDestination.Exists) diDestination.Create();
+            // Re-create subfolder using Excel filename without extension:
+            diDestination = new DirectoryInfo($@"{diDestination.FullName}\{Path.GetFileNameWithoutExtension(wbkFilename)}");
+            PurgeFolder(diDestination);
+            diDestination.Create();
 
+            destFolder = diDestination.FullName;
+
+            // Import the Excel document into the dictionary:
             Dictionary<int, string> excel = ExcelProcessor.ImportOfficeOpenXmlWorkbook(wbkFilename, hasHeaders);
             int rowCount = excel.Count;
             if (rowCount == 0)
@@ -126,8 +159,7 @@ namespace Ideal.ReNamer
             
             SourceFolder = sourceFolder;
 
-            DestFolder = destFolder;
-            WorkbookFilename = wbkFilename;
+            // If headers are not expected, the first row must be a filename, which means it contains a dot:
             string cellA1 = excel.First().Value.Split('|')[0];
             if (!hasHeaders)
             {
@@ -143,8 +175,9 @@ namespace Ideal.ReNamer
                 string nameWithoutExtension = Path.GetFileNameWithoutExtension(entry.Value.Split('|')[1]);
                 FileListEntry e = new FileListEntry
                 {
+                    ControllingWorkbook = wbkFilename,
                     ExistingFilename = fi.FullName,
-                    NewNameInDestinationFolder = $@"{DestFolder}\{nameWithoutExtension}{fi.Extension}",
+                    NewNameInDestinationFolder = $@"{destFolder}\{nameWithoutExtension}{fi.Extension}",
                     NewNameInSourceFolder = $@"{SourceFolder}\{nameWithoutExtension}{fi.Extension}",
                     ExistingFileExists = fi.Exists,
                     RowNumber = entry.Key
@@ -156,6 +189,10 @@ namespace Ideal.ReNamer
                     File.Copy(fi.FullName, e.NewNameInDestinationFolder, true);
                 }
                 fiList.Add(e);
+            }
+            if (fiList.TrueForAll(x => x.ExistingFileExists))
+            {
+                Renamer.MakeZipFiles(diDestination);
             }
         }
 
