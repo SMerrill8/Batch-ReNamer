@@ -34,8 +34,8 @@
             this.tbxResult = new System.Windows.Forms.TextBox();
             this.ctlRightMouseMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuCopy = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmdOK = new System.Windows.Forms.Button();
             this.mnuSelectAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmdOK = new System.Windows.Forms.Button();
             this.tlp.SuspendLayout();
             this.ctlRightMouseMenu.SuspendLayout();
             this.SuspendLayout();
@@ -81,15 +81,25 @@
             this.mnuCopy,
             this.mnuSelectAll});
             this.ctlRightMouseMenu.Name = "ctlRightMouseMenu";
-            this.ctlRightMouseMenu.Size = new System.Drawing.Size(205, 56);
+            this.ctlRightMouseMenu.Size = new System.Drawing.Size(205, 84);
             // 
             // mnuCopy
             // 
             this.mnuCopy.Name = "mnuCopy";
             this.mnuCopy.ShortcutKeyDisplayString = "(Ctrl-C)";
+            this.mnuCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
             this.mnuCopy.Size = new System.Drawing.Size(204, 26);
             this.mnuCopy.Text = "&Copy";
             this.mnuCopy.Click += new System.EventHandler(this.mnuCopy_Click);
+            // 
+            // mnuSelectAll
+            // 
+            this.mnuSelectAll.Name = "mnuSelectAll";
+            this.mnuSelectAll.ShortcutKeyDisplayString = "(Ctrl-A)";
+            this.mnuSelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.mnuSelectAll.Size = new System.Drawing.Size(204, 26);
+            this.mnuSelectAll.Text = "Select &All";
+            this.mnuSelectAll.Click += new System.EventHandler(this.mnuSelectAll_Click);
             // 
             // cmdOK
             // 
@@ -103,14 +113,6 @@
             this.cmdOK.Text = "OK";
             this.cmdOK.UseVisualStyleBackColor = true;
             this.cmdOK.Click += new System.EventHandler(this.cmdOK_Click);
-            // 
-            // mnuSelectAll
-            // 
-            this.mnuSelectAll.Name = "mnuSelectAll";
-            this.mnuSelectAll.ShortcutKeyDisplayString = "(Ctrl-A)";
-            this.mnuSelectAll.Size = new System.Drawing.Size(204, 26);
-            this.mnuSelectAll.Text = "Select &All";
-            this.mnuSelectAll.Click += new System.EventHandler(this.mnuSelectAll_Click);
             // 
             // FrmResult
             // 

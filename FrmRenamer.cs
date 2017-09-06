@@ -206,23 +206,19 @@ namespace Ideal.ReNamer
                 int cTotal = gb.Count;
                 int cBad = gb.Count(x => !x.ExistingFileExists);
                 int cGood = gb.Count - cBad;
-                if (cBad == 0)
+                if (cBad > 0)
                 {
-
-                }
-                else
-                {
-                    sb.Append($"ERROR: {cBad} row{(cBad > 1 ? "s contain" : " contains")} non-existent files.\r\n\r\n");
+                    sb.Append($"ERROR: {cBad} row{(cBad > 1 ? "s contain" : " contained")} non-existent files.\r\n\r\n");
                 }
 
-                sb.Append($"The first row {(chkHasHeaders.Checked ? "contains": "does not contain")} headers; ");
+                sb.Append($"The first row {(chkHasHeaders.Checked ? "contained": "did not contain")} headers; ");
                 sb.Append(
                     chkContinue.Checked
                         ? $"{cGood} of {cTotal} files were copied successfully.\r\n\n"
                         : $"No files were actually copied.\r\nCheck \"Continue on Error\" to actually copy the files.\r\n\n");
                 foreach (FileListEntry f  in gb)
                 {
-                    string sExists = $"\r\n{(f.ExistingFileExists ? "" : "  FAILED: File does not exist\r\n\r\n")}";
+                    string sExists = $"\r\n{(f.ExistingFileExists ? "" : "  FAILED: File did not exist\r\n\r\n")}";
                     sb.Append(
                         $"Row {f.RowNumber}: COPY \"{f.ExistingFilename}\" \"{f.NewNameInDestinationFolder}\":{sExists}");
                 }
