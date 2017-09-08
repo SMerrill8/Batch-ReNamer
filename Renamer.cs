@@ -15,8 +15,6 @@ namespace Ideal.ReNamer
         private string _destFolder;
         private StringCollection _workbookFilenames;
 
-        public bool ContinueOnBad { get; set; }
-
         /// <summary>
         /// constructor
         /// </summary>
@@ -24,8 +22,11 @@ namespace Ideal.ReNamer
         {
             _sourceFolder = Default.SourceFolder ?? "";
             _destFolder = Default.DestFolder ?? "";
-            _workbookFilenames = Default.WorkbookFilenames ?? new StringCollection();
+            LoadWorkbookFilenameSettings();
         }
+
+        #region Properties
+        public bool ContinueOnBad { get; set; }
 
         public string SourceFolder
         {
@@ -48,21 +49,9 @@ namespace Ideal.ReNamer
                 Default.Save();
             }
         }
+        #endregion
 
-        /// <summary>
-        /// All of the filenames
-        /// </summary>
-        public StringCollection WorkbookFilenames
-        {
-            get { return _workbookFilenames; }
-            set
-            {
-                _workbookFilenames = value;
-                Default.WorkbookFilenames = _workbookFilenames;
-                Default.Save();
-            }
-        }
-
+        #region Methods
         /// <summary>
         /// Make sure that src, dest and file exist on disk
         /// </summary>
@@ -70,7 +59,7 @@ namespace Ideal.ReNamer
         public bool ArePropertiesValid()
         {
             string src = SourceFolder;
-            StringCollection files = WorkbookFilenames;
+            StringCollection files = _workbookFilenames;
 
             bool en;
             try
@@ -108,6 +97,7 @@ namespace Ideal.ReNamer
             }
             di.Delete();
         }
+
         /// <summary>
         /// Copies files listed in the Excel worksheet specified by wbkFileName from the sourceFolder to the destFolder
         /// </summary>
@@ -206,6 +196,29 @@ namespace Ideal.ReNamer
             string destZipPath = $@"{dir}\{diDestination.Name}.zip";
             if (File.Exists(destZipPath)) File.Delete(destZipPath);
             File.Move(zipPath,destZipPath);
+        }
+
+        public void SaveWorkbookFilenameSettings()
+        {
+            Default.WorkbookFilenames = _workbookFilenames;
+            Default.Save();
+        }
+
+        private void LoadWorkbookFilenameSettings()
+        {
+            _workbookFilenames = Default.WorkbookFilenames ?? new StringCollection();
+        }
+
+        public void ClearWorkbookFilenameSettings()
+        {
+            _workbookFilenames.Clear();
+            SaveWorkbookFilenameSettings();
+        }
+        #endregion
+
+        public void AddWorkbookFilename(string value)
+        {
+            _workbookFilenames.Add(value);
         }
     }
 }

@@ -254,7 +254,6 @@
             this.ctlOpenFileDialog.DefaultExt = "*.xlsx";
             this.ctlOpenFileDialog.Filter = "Excel Files|*.xls?";
             this.ctlOpenFileDialog.Multiselect = true;
-            this.ctlOpenFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.ctlOpenFileDialog_FileOk);
             // 
             // FrmRenamer
             // 

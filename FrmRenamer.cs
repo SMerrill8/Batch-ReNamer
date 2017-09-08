@@ -12,6 +12,7 @@ namespace Ideal.ReNamer
 {
     public partial class FrmRenamer : Form
     {
+        #region Constructors
         /// <summary>
         /// Constructor
         /// </summary>
@@ -19,12 +20,11 @@ namespace Ideal.ReNamer
         {
             InitializeComponent();
             _renamer = new Renamer();
-            InitializeWorkbookFilenames(Renamer.WorkbookFilenames);
-            SourceFolder = Renamer.SourceFolder;
-            DestinationFolder = Renamer.DestFolder;
+            InitializeWorkbookFilenames();
+            SourceFolder = _renamer.SourceFolder;
+            DestinationFolder = _renamer.DestFolder;
         }
-
-
+        #endregion
 
         private readonly Renamer _renamer;
 
@@ -45,7 +45,6 @@ namespace Ideal.ReNamer
             }
         }
 
-
         public bool HasHeaders
         {
             get { return chkHasHeaders.Checked; }
@@ -64,43 +63,9 @@ namespace Ideal.ReNamer
             set { chkMakeZips.Checked = value; }
         }
 
-        public Renamer Renamer => _renamer;
-
         #endregion
 
         #region Methods
-
-        private void AddWorkbookFilename(string value)
-        {
-            if (!clbWorkbookFilenames.Items.Contains(value))
-                 clbWorkbookFilenames.Items.Add(value, true);
-        }
-
-        private void AddWorkbookFilenames(string[] fileNames)
-        {
-            foreach (string v in fileNames)
-            {
-                AddWorkbookFilename(v);
-            }
-        }
-        private void InitializeWorkbookFilenames(StringCollection renamerWorkbookFilenames)
-        {
-            clbWorkbookFilenames.Items.Clear();
-            foreach (string v in renamerWorkbookFilenames)
-            {
-                AddWorkbookFilename(v);
-            }
-        }
-
-        private StringCollection CheckedWorkbooks()
-        {
-            StringCollection ret = new StringCollection();
-            foreach (object checkedItem in clbWorkbookFilenames.CheckedItems)
-            {
-                ret.Add((string) checkedItem);
-            }
-            return ret;
-        }
 
         public void FindSourceFolder()
         {
@@ -116,8 +81,8 @@ namespace Ideal.ReNamer
                 }
             }
             if (!ctlFolderBrowserDialogSource.ShowDialog(this).Equals(DialogResult.OK)) return;
-            Renamer.SourceFolder = ctlFolderBrowserDialogSource.SelectedPath;
-            SourceFolder = Renamer.SourceFolder;
+            _renamer.SourceFolder = ctlFolderBrowserDialogSource.SelectedPath;
+            SourceFolder = _renamer.SourceFolder;
             EnableControls();
         }
 
@@ -135,12 +100,39 @@ namespace Ideal.ReNamer
                 }
             }
             if (!ctlFolderBrowserDialogDest.ShowDialog(this).Equals(DialogResult.OK)) return;
-            Renamer.DestFolder = ctlFolderBrowserDialogDest.SelectedPath;
-            DestinationFolder = Renamer.DestFolder;
+            _renamer.DestFolder = ctlFolderBrowserDialogDest.SelectedPath;
+            DestinationFolder = _renamer.DestFolder;
             EnableControls();
         }
 
-        public void AddExcelFile()
+        private StringCollection CheckedWorkbooks()
+        {
+            StringCollection ret = new StringCollection();
+            foreach (object checkedItem in clbWorkbookFilenames.CheckedItems)
+            {
+                ret.Add((string)checkedItem);
+            }
+            return ret;
+        }
+
+        private void InitializeWorkbookFilenames()
+        {
+            clbWorkbookFilenames.Items.Clear();
+            StringCollection d = Default.WorkbookFilenames;
+            if (d == null) return;
+            foreach (string v in d)
+            {
+                AddWorkbookFilenameToCheckedListbox(v);
+            }
+        }
+
+        private void AddWorkbookFilenameToCheckedListbox(string value)
+        {
+            if (!clbWorkbookFilenames.Items.Contains(value))
+                 clbWorkbookFilenames.Items.Add(value, true);
+        }
+
+        public void AddExcelFiles()
         {
             string t = (string) clbWorkbookFilenames.SelectedItem;
             ctlOpenFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -167,10 +159,23 @@ namespace Ideal.ReNamer
                 }
             }
             if (!ctlOpenFileDialog.ShowDialog(this).Equals(DialogResult.OK)) return;
-            AddWorkbookFilenames(ctlOpenFileDialog.FileNames);
+            if (ctlOpenFileDialog.FileNames != null)
+            {
+                foreach (string v in ctlOpenFileDialog.FileNames)
+                {
+                    AddWorkbookFilenameToCheckedListbox(v);
+                    _renamer.AddWorkbookFilename(v);
+                }
+                _renamer.SaveWorkbookFilenameSettings();
+            }
             EnableControls();
         }
 
+        public void ClearExcelFiles()
+        {
+            clbWorkbookFilenames.Items.Clear();
+            _renamer.ClearWorkbookFilenameSettings();
+        }
 
         public void Run()
         {
@@ -192,7 +197,7 @@ namespace Ideal.ReNamer
                 btnRun.Enabled = false;
                 foreach (string v in CheckedWorkbooks())
                 {
-                    Renamer.CopyFiles(
+                    _renamer.CopyFiles(
                         tbxSourceFolder.Text,
                         tbxDestFolder.Text,
                         v,
@@ -242,7 +247,7 @@ namespace Ideal.ReNamer
 
         private void EnableControls()
         {
-            btnRun.Enabled = Renamer.ArePropertiesValid();
+            btnRun.Enabled = _renamer.ArePropertiesValid();
         }
 
         #endregion
@@ -261,7 +266,7 @@ namespace Ideal.ReNamer
 
         private void btnExcelFile_click(object sender, EventArgs e)
         {
-            AddExcelFile();
+            AddExcelFiles();
         }
 
         private void btnRun_Click(object sender, EventArgs e)
@@ -295,15 +300,11 @@ namespace Ideal.ReNamer
 
         private void btnClearFiles_Click(object sender, EventArgs e)
         {
-            clbWorkbookFilenames.Items.Clear();
-            _renamer.WorkbookFilenames.Clear();
+            ClearExcelFiles();
         }
+
 
         #endregion
 
-        private void ctlOpenFileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-
-        }
     }
 }
